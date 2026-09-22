@@ -29,7 +29,12 @@ from orbit_predict.model_b import (
     cross_validate_candidate,
     select_features,
 )
-from orbit_predict.reporting import json_ready
+from orbit_predict.reporting import (
+    _fmt_metric,
+    json_ready,
+    write_json,
+    write_markdown_report,
+)
 from orbit_predict.split import make_split
 
 
@@ -398,3 +403,110 @@ def test_INT_reporting_json_ready_특수타입_직렬화_검증() -> None:
     assert cleaned["nan_val"] is None
     assert cleaned["inf_val"] is None
     assert cleaned["list_val"] == [1, None]
+
+
+def test_INT_reporting_fmt_metric_다양한_입력_포매팅_검증() -> None:
+    """_fmt_metric: None 처리('미기록') 및 부동소수점 포매팅 경계값 검증."""
+    assert _fmt_metric(None) == "미기록"
+    assert _fmt_metric(1234.56789) == "1,234.567890"
+    assert _fmt_metric(0) == "0.000000"
+    assert _fmt_metric("3.14") == "3.140000"
+
+
+def test_INT_reporting_write_markdown_report_최신커밋_문구_및_내용_검증(tmp_path: Path) -> None:
+    """write_markdown_report: 직전 커밋 변경 문구 및 보고서 구조/형식 검증."""
+    class DummyResult:
+        metrics = [
+            {
+                "stage": "model_a",
+                "rmse": 1.234,
+                "huber_score": 10.5,
+                "max_absolute_error": 5.0,
+                "note": "test note",
+            },
+            {
+                "stage": "model_b_final",
+                "rmse": None,
+                "huber_score": 12.3,
+                "max_absolute_error": None,
+            },
+        ]
+        feature_selection = {
+            "importance": [
+                {"source_column": "X_Position", "mean_huber_increase": 100.0},
+            ],
+            "candidates": [
+                {
+                    "source_columns": ("X_Position",),
+                    "mean_rmse": 5.0,
+                    "mean_huber_score": 20.0,
+                    "feature_count": 4,
+                    "estimated_matrix_bytes": 1024,
+                }
+            ],
+            "sample_size": 1000,
+            "ranked_columns": ["X_Position"],
+            "selected_k": 1,
+            "selected_columns": ["X_Position"],
+            "best_reduced_k": 1,
+            "best_reduced_columns": ["X_Position"],
+        }
+        outputs = {"sub_a": "submission_model_a.csv"}
+        train_rows = 636363
+        test_rows = 63000
+        sample_rows = 63000
+        input_columns = ["X_Position", "Velocity"]
+        comparison_rows = 127273
+        development_rows = 509090
+        model_b_config = "DummyConfig"
+        model_a_parameters = "DummyParams"
+        model_a_development_exception_count = 0
+        model_a_test_exception_count = 0
+
+    report_file = tmp_path / "report.md"
+    write_markdown_report(report_file, DummyResult())
+
+    assert report_file.is_file()
+    content = report_file.read_text(encoding="utf-8")
+
+    # 직전 커밋에서 수정한 정확한 문구 검증
+    expected_sentence = "두 CSV는 `Satellite_ID,Y_Position` 순서이며 샘플 제출물의 ID·행 순서를 검증했다. 사용자가 Kaggle에서 직접 제출하며, 다음 순서로 진행한다."
+    assert expected_sentence in content
+
+    # 필수 섹션 포함 검증
+    assert "## 1. 입력 데이터와 재현 조건" in content
+    assert "## 2. 모델 경로" in content
+    assert "## 3. 공통 최종 비교 구간 성능" in content
+    assert "## 4. 제출 파일과 사용자 업로드" in content
+    assert "## 5. 한계와 해석 주의" in content
+    assert "| model_a | 1.234000 | 10.500000 | 5.000000 | test note |" in content
+    assert "| model_b_final | 미기록 | 12.300000 | 미기록 |  |" in content
+
+
+def test_INT_reporting_write_json_부모디렉토리_자동생성_및_무결성_검증(tmp_path: Path) -> None:
+    """write_json: 부모 디렉토리 미존재 시 자동 생성 및 UTF-8 한글 JSON 무결성 검증."""
+    nested_path = tmp_path / "deep" / "nested" / "dir" / "artifact.json"
+    payload = {
+        "title": "테스트 산출물",
+        "score": 123.456,
+        "items": [1, 2, np.float64(3.0)],
+    }
+    write_json(nested_path, payload)
+
+    assert nested_path.is_file()
+    text = nested_path.read_text(encoding="utf-8")
+    assert "테스트 산출물" in text  # ensure_ascii=False 확인
+    assert "\n" in text
+
+
+def test_INT_reporting_json_ready_중첩_컨테이너_및_비유한값_변환_검증() -> None:
+    """json_ready: 튜플, 리스트, 딕셔너리 중첩 및 nan/inf의 None 재귀 변환 검증."""
+    data = {
+        "tuple_data": (1, float("nan"), 3),
+        "nested_dict": {"sub": [float("-inf"), float("inf"), "safe"]},
+        "already_safe": "hello",
+    }
+    cleaned = json_ready(data)
+    assert cleaned["tuple_data"] == [1, None, 3]
+    assert cleaned["nested_dict"]["sub"] == [None, None, "safe"]
+    assert cleaned["already_safe"] == "hello"

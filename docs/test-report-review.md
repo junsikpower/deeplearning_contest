@@ -10,8 +10,8 @@
   - `tests/review/test_prd_functional.py`: PRD 기능 요구사항(FR-01 ~ FR-07) 검증 (19개 케이스)
   - `tests/review/test_prd_rules_and_edges.py`: 비즈니스 규칙(BR), 예외/에지 케이스(EC), 비기능 요구사항(NFR), 제외/기술 제약(OOS, TC) 검증 (15개 케이스)
   - `tests/review/test_prd_acceptance.py`: 인수 기준(AC 13.1, AC 13.2 통합, AC 13.3 사용자 시나리오) 검증 (7개 케이스)
-  - `tests/review/test_code_regression_int.py`: 최신 커밋 코드 기반 회귀/경계값/내부 계약(`INT`) 검증 (42개 케이스)
-  - **총 테스트 케이스:** 83개
+  - `tests/review/test_code_regression_int.py`: 최신 커밋 코드 기반 회귀/경계값/내부 계약(`INT`) 검증 (46개 케이스)
+  - **총 테스트 케이스:** 87개
 
 ---
 
@@ -111,6 +111,10 @@
 | `test_INT_cli_check_inputs_정상실행_검증` | `src/orbit_predict/cli.py:54` | --check-inputs 플래그 단독 실행 시 반환값 0 검증 |
 | `test_INT_split_make_split_음수행_또는_잘못된_비율_예외처리` | `src/orbit_predict/split.py:30` | row_count <= 0 또는 fraction 범위 오류 시 ValueError 발생 검증 |
 | `test_INT_reporting_json_ready_특수타입_직렬화_검증` | `src/orbit_predict/reporting.py:10` | numpy scalar, nan, inf, 중첩 딕셔너리/리스트 JSON 안전 직렬화 검증 |
+| `test_INT_reporting_fmt_metric_다양한_입력_포매팅_검증` | `src/orbit_predict/reporting.py:37` | None('미기록') 및 부동소수점 포매팅 경계값 검증 |
+| `test_INT_reporting_write_markdown_report_최신커밋_문구_및_내용_검증` | `src/orbit_predict/reporting.py:130` | 직전 커밋 변경 문구 및 보고서 마크다운 구조/형식 검증 |
+| `test_INT_reporting_write_json_부모디렉토리_자동생성_및_무결성_검증` | `src/orbit_predict/reporting.py:27` | 부모 디렉토리 미존재 시 자동 생성 및 UTF-8 한글 JSON 무결성 검증 |
+| `test_INT_reporting_json_ready_중첩_컨테이너_및_비유한값_변환_검증` | `src/orbit_predict/reporting.py:10` | 튜플, 리스트, 딕셔너리 중첩 및 nan/inf의 None 재귀 변환 검증 |
 
 ---
 
