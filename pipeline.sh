@@ -33,7 +33,7 @@ PROMPT_REVIEW="prompts/review.md"       # 테스트AI 프롬프트 파일
 # AI CLI 실행 명령.
 # {PROMPT} 자리에 프롬프트 전문이 들어간다.
 # 쓰는 CLI에 맞게 이 두 줄만 바꾸면 된다.
-DEV_AI_CMD=(codex exec --sandbox workspace-write --approve-for-me)
+DEV_AI_CMD=(codex exec --approve-for-me)
 TEST_AI_CMD=(opencode run --auto)
 
 
