@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -74,3 +75,55 @@ def test_AC13_2_사용자제출전_공개점수미확인보고서(circle_frames,
     assert "모델 A" in report and "모델 B" in report
     assert "피처 선택" in report
     assert "Submit Predictions" in report
+
+
+def test_EC03_구간별오차와입력분포차이_산출물기록(
+    circle_frames, small_model_config, tmp_path: Path
+):
+    train, test, sample = circle_frames
+    paths = []
+    for name, frame in (("train.csv", train), ("test.csv", test), ("sample.csv", sample)):
+        path = tmp_path / name
+        frame.to_csv(path, index=False)
+        paths.append(path)
+
+    artifact_dir = tmp_path / "artifacts"
+    run_experiment(
+        DatasetPaths(*paths),
+        output_dir=tmp_path / "out",
+        artifact_dir=artifact_dir,
+        report_path=tmp_path / "report.md",
+        model_b_config=small_model_config,
+        strict_row_counts=False,
+    )
+
+    distribution = json.loads((artifact_dir / "data_distribution.json").read_text(encoding="utf-8"))
+    error_segments = json.loads((artifact_dir / "error_segments.json").read_text(encoding="utf-8"))
+    assert set(distribution) == {"train", "test"}
+    assert set(error_segments) == {"model_a", "model_b_final"}
+
+
+def test_EC04_사용자제출전_보고서초안과미확인상태유지(
+    circle_frames, small_model_config, tmp_path: Path
+):
+    train, test, sample = circle_frames
+    paths = []
+    for name, frame in (("train.csv", train), ("test.csv", test), ("sample.csv", sample)):
+        path = tmp_path / name
+        frame.to_csv(path, index=False)
+        paths.append(path)
+
+    report_path = tmp_path / "report.md"
+    run_experiment(
+        DatasetPaths(*paths),
+        output_dir=tmp_path / "out",
+        artifact_dir=tmp_path / "artifacts",
+        report_path=report_path,
+        model_b_config=small_model_config,
+        strict_row_counts=False,
+    )
+
+    report = report_path.read_text(encoding="utf-8")
+    assert "실제 Kaggle 점수" in report
+    assert "점수와 순위를 아직 기재하지 않는다" in report
+    assert "사용자가 Kaggle에서 직접 제출" in report

@@ -286,9 +286,12 @@ for ((i = 1; i <= MAX_LOOP; i++)); do
 
     # ── ⑩ push ────────────────────────────────────────────────
     step "⑩ git push"
-    if ! git push 2>&1 | tee -a "$LOG_FILE"; then
-        log "push 실패 → 다음 회차로"
-        continue
+    if ! git push -u origin master 2>&1 | tee -a "$LOG_FILE"; then
+        log "master 푸시 실패 → main 브랜치로 재시도합니다"
+        if ! git push -u origin HEAD:main 2>&1 | tee -a "$LOG_FILE"; then
+            log "push 실패 (master, main 모두 실패) → 다음 회차로"
+            continue
+        fi
     fi
 
     # ── ⑪ GitHub Actions 대기 ─────────────────────────────────
