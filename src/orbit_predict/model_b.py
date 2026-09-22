@@ -55,9 +55,7 @@ class ModelB:
     estimator_factory: Callable[[ModelBConfig], object] = build_estimator
 
     def __post_init__(self) -> None:
-        self.source_columns = tuple(self.source_columns)
-        if not self.source_columns:
-            raise ValueError("model B requires at least one source column")
+        self.source_columns = _validate_source_columns(self.source_columns)
         self.feature_builder: GeneralFeatureBuilder | None = None
         self.estimator: object | None = None
 

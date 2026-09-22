@@ -4,6 +4,7 @@ import inspect
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from orbit_predict.constants import INPUT_COLUMNS
 from orbit_predict.features import GeneralFeatureBuilder
@@ -53,6 +54,11 @@ def test_FR04_모델B_모델A공식상수와예측값을참조하지않음():
     assert "630" not in source
     assert "550" not in source
     assert "420" not in source
+
+
+def test_FR04_모델B_타깃열등_비승인입력차단(small_model_config):
+    with pytest.raises(ValueError, match="not approved inputs"):
+        ModelB(("Y_Position",), small_model_config)
 
 
 def test_INT_피처빌더_선택열에따라파생피처수일관성():
