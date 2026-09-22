@@ -1,0 +1,80 @@
+{
+  "train_rows": 636363,
+  "test_rows": 63000,
+  "sample_rows": 63000,
+  "development_rows": 509090,
+  "comparison_rows": 127273,
+  "split": {
+    "seed": 42,
+    "comparison_fraction": 0.2,
+    "development_count": 509090,
+    "comparison_count": 127273
+  },
+  "model_b_config": {
+    "max_iter": 120,
+    "learning_rate": 0.08,
+    "max_leaf_nodes": 31,
+    "min_samples_leaf": 40,
+    "l2_regularization": 1.0,
+    "random_state": 42,
+    "selection_sample_size": 100000,
+    "cv_folds": 3
+  },
+  "model_a_parameters": {
+    "center_x": 629.9999999996215,
+    "center_y": 550.0000000004369,
+    "radius": 420.0000000000012,
+    "coefficient_d": -1259.999999999243,
+    "coefficient_e": -1100.0000000008738,
+    "coefficient_f": 523000.00000000274
+  },
+  "model_a_exceptions": {
+    "comparison": [],
+    "test": []
+  },
+  "metrics": [
+    {
+      "stage": "baseline_development_mean",
+      "rmse": 296.4444680119112,
+      "huber_score": 1321767.5518429852,
+      "max_absolute_error": 420.00511865342173,
+      "note": ""
+    },
+    {
+      "stage": "model_a",
+      "rmse": 1.0883115975889029e-07,
+      "huber_score": 5.92211066723255e-12,
+      "max_absolute_error": 2.3911673110887932e-05,
+      "note": ""
+    },
+    {
+      "stage": "model_b_all_inputs",
+      "rmse": 1.068968038611582,
+      "huber_score": 571.3463337865464,
+      "max_absolute_error": 2.8241119656910314,
+      "note": "전체 일곱 원본 입력 기준"
+    },
+    {
+      "stage": "model_b_best_reduced",
+      "rmse": 1.0686275663060363,
+      "huber_score": 570.982437734581,
+      "max_absolute_error": 2.8168264909986647,
+      "note": "최고 축소 후보 k=3"
+    },
+    {
+      "stage": "model_b_final",
+      "rmse": 1.0686275663060363,
+      "huber_score": 570.982437734581,
+      "max_absolute_error": 2.8168264909986647,
+      "note": "교차검증 선택 k=3"
+    }
+  ],
+  "outputs": {
+    "model_a_submission": "outputs\\submission_model_a.csv",
+    "model_b_submission": "outputs\\submission_model_b.csv",
+    "model_a_exceptions": "artifacts\\model_a_exceptions.json",
+    "feature_selection": "artifacts\\feature_selection.json",
+    "data_distribution": "artifacts\\data_distribution.json",
+    "error_segments": "artifacts\\error_segments.json"
+  }
+}

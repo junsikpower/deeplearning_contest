@@ -1,0 +1,301 @@
+{
+  "sample_size": 100000,
+  "importance": [
+    {
+      "source_column": "X_Position",
+      "mean_huber_increase": 715860.9678040637,
+      "fold_huber_increases": [
+        716797.4740631044,
+        717482.3536657315,
+        713303.0756833552
+      ]
+    },
+    {
+      "source_column": "Velocity",
+      "mean_huber_increase": 1324398.5945149253,
+      "fold_huber_increases": [
+        1332750.2259367628,
+        1312932.7067526276,
+        1327512.8508553857
+      ]
+    },
+    {
+      "source_column": "Altitude",
+      "mean_huber_increase": 1323449.695619289,
+      "fold_huber_increases": [
+        1312607.5504510938,
+        1327840.7004005099,
+        1329900.8360062633
+      ]
+    },
+    {
+      "source_column": "Fuel_Level",
+      "mean_huber_increase": 0.4708635204284519,
+      "fold_huber_increases": [
+        0.5122800204034093,
+        0.8773460062968752,
+        0.022964534585071306
+      ]
+    },
+    {
+      "source_column": "Signal_Strength",
+      "mean_huber_increase": 0.06416460466997857,
+      "fold_huber_increases": [
+        0.18000441512606358,
+        0.38274513021997336,
+        -0.37025573133610123
+      ]
+    },
+    {
+      "source_column": "Battery_Temp",
+      "mean_huber_increase": 0.03211686930520349,
+      "fold_huber_increases": [
+        0.02724449484185243,
+        -0.1143776308890665,
+        0.18348374396282452
+      ]
+    },
+    {
+      "source_column": "Solar_Exposure",
+      "mean_huber_increase": 0.3441265173053883,
+      "fold_huber_increases": [
+        0.37721497034794993,
+        -0.20104306297139374,
+        0.8562076445396087
+      ]
+    }
+  ],
+  "ranked_columns": [
+    "Velocity",
+    "Altitude",
+    "X_Position",
+    "Fuel_Level",
+    "Solar_Exposure",
+    "Signal_Strength",
+    "Battery_Temp"
+  ],
+  "candidates": [
+    {
+      "source_columns": [
+        "Velocity"
+      ],
+      "folds": [
+        {
+          "rmse": 296.93741331007516,
+          "huber_score": 1323387.0362915958,
+          "max_absolute_error": 485.86724752889774
+        },
+        {
+          "rmse": 296.71317386402,
+          "huber_score": 1321695.9215581904,
+          "max_absolute_error": 496.63418040625544
+        },
+        {
+          "rmse": 298.52495367124607,
+          "huber_score": 1331462.4872909577,
+          "max_absolute_error": 499.50400154538
+        }
+      ],
+      "mean_rmse": 297.39184694844704,
+      "mean_huber_score": 1325515.1483802479,
+      "feature_count": 4,
+      "estimated_matrix_bytes_per_row": 16,
+      "estimated_matrix_bytes": 1600000
+    },
+    {
+      "source_columns": [
+        "Velocity",
+        "Altitude"
+      ],
+      "folds": [
+        {
+          "rmse": 128.93934027349425,
+          "huber_score": 548737.799257805,
+          "max_absolute_error": 300.214196962899
+        },
+        {
+          "rmse": 129.52000311892434,
+          "huber_score": 550270.8671380115,
+          "max_absolute_error": 291.4004586895511
+        },
+        {
+          "rmse": 129.4159009499076,
+          "huber_score": 552676.8882997251,
+          "max_absolute_error": 304.6531300380245
+        }
+      ],
+      "mean_rmse": 129.29174811410874,
+      "mean_huber_score": 550561.8515651805,
+      "feature_count": 10,
+      "estimated_matrix_bytes_per_row": 40,
+      "estimated_matrix_bytes": 4000000
+    },
+    {
+      "source_columns": [
+        "Velocity",
+        "Altitude",
+        "X_Position"
+      ],
+      "folds": [
+        {
+          "rmse": 1.092011864648712,
+          "huber_score": 596.2449562667784,
+          "max_absolute_error": 3.5059218818591944
+        },
+        {
+          "rmse": 1.085082701375183,
+          "huber_score": 588.7022344118321,
+          "max_absolute_error": 3.6786383202992283
+        },
+        {
+          "rmse": 1.071283703638596,
+          "huber_score": 573.8243868408138,
+          "max_absolute_error": 3.3457883952740985
+        }
+      ],
+      "mean_rmse": 1.0827927565541635,
+      "mean_huber_score": 586.2571925064748,
+      "feature_count": 18,
+      "estimated_matrix_bytes_per_row": 72,
+      "estimated_matrix_bytes": 7200000
+    },
+    {
+      "source_columns": [
+        "Velocity",
+        "Altitude",
+        "X_Position",
+        "Fuel_Level"
+      ],
+      "folds": [
+        {
+          "rmse": 1.093147334429097,
+          "huber_score": 597.48554738472,
+          "max_absolute_error": 3.6463859047856886
+        },
+        {
+          "rmse": 1.0858669081891048,
+          "huber_score": 589.5534711500828,
+          "max_absolute_error": 3.537906196029894
+        },
+        {
+          "rmse": 1.072338119725794,
+          "huber_score": 574.9545215085257,
+          "max_absolute_error": 3.2344308244386184
+        }
+      ],
+      "mean_rmse": 1.083784120781332,
+      "mean_huber_score": 587.3311800144428,
+      "feature_count": 28,
+      "estimated_matrix_bytes_per_row": 112,
+      "estimated_matrix_bytes": 11200000
+    },
+    {
+      "source_columns": [
+        "Velocity",
+        "Altitude",
+        "X_Position",
+        "Fuel_Level",
+        "Solar_Exposure"
+      ],
+      "folds": [
+        {
+          "rmse": 1.093791817841718,
+          "huber_score": 598.190270388745,
+          "max_absolute_error": 3.6852592034572353
+        },
+        {
+          "rmse": 1.0867223389821876,
+          "huber_score": 590.4827210214582,
+          "max_absolute_error": 3.5513656483743716
+        },
+        {
+          "rmse": 1.0729748445707379,
+          "huber_score": 575.6375085407997,
+          "max_absolute_error": 3.241532101400935
+        }
+      ],
+      "mean_rmse": 1.0844963337982145,
+      "mean_huber_score": 588.1034999836677,
+      "feature_count": 40,
+      "estimated_matrix_bytes_per_row": 160,
+      "estimated_matrix_bytes": 16000000
+    },
+    {
+      "source_columns": [
+        "Velocity",
+        "Altitude",
+        "X_Position",
+        "Fuel_Level",
+        "Solar_Exposure",
+        "Signal_Strength"
+      ],
+      "folds": [
+        {
+          "rmse": 1.0954280774334004,
+          "huber_score": 599.9813364147179,
+          "max_absolute_error": 3.5617108693544424
+        },
+        {
+          "rmse": 1.0879529904667498,
+          "huber_score": 591.8208547327719,
+          "max_absolute_error": 3.457593258747579
+        },
+        {
+          "rmse": 1.0745397890010637,
+          "huber_score": 577.3178790732253,
+          "max_absolute_error": 3.3878228900944123
+        }
+      ],
+      "mean_rmse": 1.0859736189670712,
+      "mean_huber_score": 589.7066900735717,
+      "feature_count": 54,
+      "estimated_matrix_bytes_per_row": 216,
+      "estimated_matrix_bytes": 21600000
+    },
+    {
+      "source_columns": [
+        "Velocity",
+        "Altitude",
+        "X_Position",
+        "Fuel_Level",
+        "Solar_Exposure",
+        "Signal_Strength",
+        "Battery_Temp"
+      ],
+      "folds": [
+        {
+          "rmse": 1.095396085933844,
+          "huber_score": 599.9462925395928,
+          "max_absolute_error": 3.7649628346628106
+        },
+        {
+          "rmse": 1.0882603219971254,
+          "huber_score": 592.1552642166434,
+          "max_absolute_error": 3.5015517553355267
+        },
+        {
+          "rmse": 1.0743194209694351,
+          "huber_score": 577.0811091360512,
+          "max_absolute_error": 3.3934891722891507
+        }
+      ],
+      "mean_rmse": 1.0859919429668015,
+      "mean_huber_score": 589.7275552974291,
+      "feature_count": 70,
+      "estimated_matrix_bytes_per_row": 280,
+      "estimated_matrix_bytes": 28000000
+    }
+  ],
+  "selected_k": 3,
+  "selected_columns": [
+    "Velocity",
+    "Altitude",
+    "X_Position"
+  ],
+  "best_reduced_k": 3,
+  "best_reduced_columns": [
+    "Velocity",
+    "Altitude",
+    "X_Position"
+  ]
+}
