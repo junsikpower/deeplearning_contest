@@ -125,8 +125,37 @@ def test_INT_predict_circle_Satellite_ID_없는경우_정상동작() -> None:
 
 # --- model_b.py INT tests ---
 
+def test_INT_ModelB_생성자_비승인_소스컬럼_예외처리() -> None:
+    """ModelB: INPUT_COLUMNS에 없는 비승인 컬럼 사용 시 생성자에서 ValueError 발생."""
+    config = ModelBConfig()
+    with pytest.raises(ValueError, match="not approved inputs"):
+        ModelB(("Unapproved_Column",), config)
+
+
+def test_INT_ModelB_생성자_중복_소스컬럼_예외처리() -> None:
+    """ModelB: 중복된 컬럼 전달 시 생성자에서 ValueError 발생."""
+    config = ModelBConfig()
+    with pytest.raises(ValueError, match="source columns must be unique"):
+        ModelB(("X_Position", "X_Position"), config)
+
+
+def test_INT_ModelB_생성자_빈_소스컬럼_예외처리() -> None:
+    """ModelB: 빈 컬럼 전달 시 생성자에서 ValueError 발생."""
+    config = ModelBConfig()
+    with pytest.raises(ValueError, match="requires at least one source column"):
+        ModelB((), config)
+
+
+def test_INT_ModelB_생성자_리스트입력시_튜플변환_검증() -> None:
+    """ModelB: 리스트 등 Iterable 입력 시 tuple로 변환되어 저장됨을 검증."""
+    config = ModelBConfig()
+    model = ModelB(["X_Position", "Velocity"], config)
+    assert isinstance(model.source_columns, tuple)
+    assert model.source_columns == ("X_Position", "Velocity")
+
+
 def test_INT_ModelB_미승인_소스컬럼_예외처리() -> None:
-    """ModelB: INPUT_COLUMNS에 없는 비승인 컬럼 사용 시 ValueError 발생."""
+    """_validate_source_columns: INPUT_COLUMNS에 없는 비승인 컬럼 사용 시 ValueError 발생."""
     with pytest.raises(ValueError, match="not approved inputs"):
         _validate_source_columns(("Unapproved_Column",))
 

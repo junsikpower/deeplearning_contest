@@ -227,6 +227,23 @@ def test_FR04_모델B_학습_및_예측_동작_검증() -> None:
     assert np.isfinite(preds).all()
 
 
+def test_FR04_모델B_타깃열_및_Satellite_ID_입력차단_검증() -> None:
+    """PRD FR-04: 모델 B의 입력은 Y_Position과 Satellite_ID를 제외한 일곱 원본 입력 열이어야 하며 타깃열 및 ID 유입을 차단."""
+    config = ModelBConfig(max_iter=5, random_state=42)
+    
+    # 1. Y_Position 단독 또는 포함 입력 시 차단
+    with pytest.raises(ValueError, match="not approved inputs"):
+        ModelB((TARGET_COLUMN,), config=config)
+    with pytest.raises(ValueError, match="not approved inputs"):
+        ModelB(("X_Position", TARGET_COLUMN), config=config)
+
+    # 2. Satellite_ID 단독 또는 포함 입력 시 차단
+    with pytest.raises(ValueError, match="not approved inputs"):
+        ModelB((ID_COLUMN,), config=config)
+    with pytest.raises(ValueError, match="not approved inputs"):
+        ModelB(("X_Position", ID_COLUMN), config=config)
+
+
 def test_FR05_그룹단위_순열중요도_파생피처_동시반영_검증() -> None:
     """PRD FR-05: 원본 열별 그룹 단위 순열 중요도 측정 (파생 피처도 동시 permute/recompute)."""
     config = ModelBConfig(max_iter=10, cv_folds=2, random_state=42)

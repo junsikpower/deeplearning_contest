@@ -295,10 +295,9 @@ for ((i = 1; i <= MAX_LOOP; i++)); do
     # 클린 환경 재현성, 준비물 검사, 부정행위 감시(XML·건수·skip),
     # 시크릿 유출 검사는 여기서만 수행된다.
     step "⑪ GitHub Actions 대기"
-    if wait_actions; then
-        log "GitHub Actions 통과"
-    else
-        log "GitHub Actions 실패 — 실패 사실만 기록하고 성공 처리합니다"
+    if ! wait_actions; then
+        log "verdict = false → 다음 회차로"
+        continue
     fi
 
     # ── ⑫ 성공 ────────────────────────────────────────────────

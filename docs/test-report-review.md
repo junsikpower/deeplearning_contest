@@ -31,6 +31,7 @@
 | `test_FR04_모델B_파생피처_생성_원공식_독립성_검증` | FR-04 | 원 공식(630, 550, 420) 없이 일반 파생 피처(abs, square, sign, pair-product, pair-sign) 생성 및 독립성 검증 |
 | `test_FR04_모델B_학습접힘_중앙값_전처리_격리_검증` | FR-04 | 결측치 대체 중앙값이 학습 접힘 데이터에서만 추정되고 평가 데이터에 누수되지 않는지 검증 |
 | `test_FR04_모델B_학습_및_예측_동작_검증` | FR-04 | ModelB 인스턴스의 fit 및 predict 정상 수행과 유한한 예측값 산출 검증 |
+| `test_FR04_모델B_타깃열_및_Satellite_ID_입력차단_검증` | FR-04 | ModelB가 Y_Position(타깃) 또는 Satellite_ID(비승인) 컬럼을 source_columns로 수신할 때의 유입 차단 검증 |
 | `test_FR05_그룹단위_순열중요도_파생피처_동시반영_검증` | FR-05 | 원본 열 순열 시 파생 피처 동시 재계산을 통한 그룹 단위 순열 중요도(Huber 증가량) 산출 검증 |
 | `test_FR05_상위_k개_후보_평가_및_최적k_선택_검증` | FR-05 | k=1..7 후보 평가를 통한 최적 k 및 최고 축소 후보(k<=6) 도출 검증 |
 | `test_FR06_두_제출파일_행수_컬럼_순서_일치_검증` | FR-06 | outputs의 모델 A, 모델 B 제출 CSV 파일의 63,000행 및 샘플 대비 ID/순서 일치 검증 |
@@ -76,7 +77,11 @@
 | `test_INT_fit_circle_공선점_입력시_랭크부족_예외처리` | `src/orbit_predict/model_a.py:58` | 일직선상의 점들 입력으로 rank deficient 발생 시 ModelAError 처리 검증 |
 | `test_INT_predict_circle_필수컬럼_누락시_예외처리` | `src/orbit_predict/model_a.py:82` | X_Position, Velocity, Altitude 중 누락 시 ModelAError 발생 검증 |
 | `test_INT_predict_circle_Satellite_ID_없는경우_정상동작` | `src/orbit_predict/model_a.py:101` | frame에 Satellite_ID가 없는 경우 row_position을 기본 식별자로 대체 처리 검증 |
-| `test_INT_ModelB_미승인_소스컬럼_예외처리` | `src/orbit_predict/model_b.py:154` | INPUT_COLUMNS에 없는 컬럼 지정 시 ValueError 발생 검증 |
+| `test_INT_ModelB_생성자_비승인_소스컬럼_예외처리` | `src/orbit_predict/model_b.py:58` | ModelB 생성 시 INPUT_COLUMNS에 없는 비승인 컬럼 지정 시 ValueError 발생 검증 |
+| `test_INT_ModelB_생성자_중복_소스컬럼_예외처리` | `src/orbit_predict/model_b.py:58` | ModelB 생성 시 중복된 컬럼 지정 시 ValueError 발생 검증 |
+| `test_INT_ModelB_생성자_빈_소스컬럼_예외처리` | `src/orbit_predict/model_b.py:58` | ModelB 생성 시 빈 컬럼 전달 시 ValueError 발생 검증 |
+| `test_INT_ModelB_생성자_리스트입력시_튜플변환_검증` | `src/orbit_predict/model_b.py:58` | ModelB 생성 시 리스트 입력이 tuple 타입으로 변환 및 보존되는지 검증 |
+| `test_INT_ModelB_미승인_소스컬럼_예외처리` | `src/orbit_predict/model_b.py:154` | _validate_source_columns 함수 단위 비승인 컬럼 예외 검증 |
 | `test_INT_ModelB_fit_전_predict_호출시_예외처리` | `src/orbit_predict/model_b.py:88` | fit() 전 predict() 호출 시 RuntimeError 발생 검증 |
 | `test_INT_ModelB_타깃길이_불일치_예외처리` | `src/orbit_predict/model_b.py:69` | frame과 target의 행 수 불일치 시 ValueError 발생 검증 |
 | `test_INT_ModelB_비유한_타깃_예외처리` | `src/orbit_predict/model_b.py:72` | target에 NaN 또는 Inf 포함 시 ValueError 발생 검증 |
