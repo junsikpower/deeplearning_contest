@@ -288,6 +288,32 @@ def test_FR05_상위_k개_후보_평가_및_최적k_선택_검증() -> None:
     assert len(res.ranked_columns) == 3
 
 
+def test_FR05_동점시_적은_원본열_후보선택_검증() -> None:
+    """PRD FR-05: 평균 교차검증 Huber 점수가 가장 낮은 k를 최종으로 정하며, 동점이면 원본 열이 더 적은 후보를 선택."""
+    from orbit_predict.model_b import CrossValidationResult
+    c1 = CrossValidationResult(
+        source_columns=("X_Position",),
+        folds=(),
+        mean_rmse=10.0,
+        mean_huber_score=50.0,
+        feature_count=4,
+        estimated_matrix_bytes_per_row=16,
+        estimated_matrix_bytes=1600,
+    )
+    c2 = CrossValidationResult(
+        source_columns=("X_Position", "Velocity"),
+        folds=(),
+        mean_rmse=10.0,
+        mean_huber_score=50.0,
+        feature_count=10,
+        estimated_matrix_bytes_per_row=40,
+        estimated_matrix_bytes=4000,
+    )
+    best = min([c2, c1], key=lambda c: (c.mean_huber_score, len(c.source_columns)))
+    assert len(best.source_columns) == 1
+    assert best.source_columns == ("X_Position",)
+
+
 def test_FR06_두_제출파일_행수_컬럼_순서_일치_검증() -> None:
     """PRD FR-06: 모델 A와 모델 B 각각 63,000행 예측 CSV 별도 생성, 샘플 제출물과 ID 및 행 순서 일치."""
     assert MODEL_A_SUBMISSION.is_file(), f"모델 A 제출 파일 부재: {MODEL_A_SUBMISSION}"

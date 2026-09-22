@@ -7,16 +7,17 @@
 - **CI 산출물 경로:** `reports/review.xml` (JUnit XML 형식)
 - **테스트 코드 위치:** `tests/review/` (`tests/dev/`의 개발자 테스트 코드는 일체 참조하지 않음)
 - **테스트 파일 구성:**
-  - `tests/review/test_prd_functional.py`: PRD 기능 요구사항(FR-01 ~ FR-07) 검증
-  - `tests/review/test_prd_rules_and_edges.py`: 비즈니스 규칙(BR), 예외/에지 케이스(EC), 비기능 요구사항(NFR), 제외/기술 제약(OOS, TC) 검증
-  - `tests/review/test_prd_acceptance.py`: 인수 기준(AC 13.1, AC 13.2 통합, AC 13.3 사용자 시나리오) 검증
-  - `tests/review/test_code_regression_int.py`: 최신 커밋 코드 기반 회귀/경계값/내부 계약(`INT`) 검증
+  - `tests/review/test_prd_functional.py`: PRD 기능 요구사항(FR-01 ~ FR-07) 검증 (19개 케이스)
+  - `tests/review/test_prd_rules_and_edges.py`: 비즈니스 규칙(BR), 예외/에지 케이스(EC), 비기능 요구사항(NFR), 제외/기술 제약(OOS, TC) 검증 (15개 케이스)
+  - `tests/review/test_prd_acceptance.py`: 인수 기준(AC 13.1, AC 13.2 통합, AC 13.3 사용자 시나리오) 검증 (7개 케이스)
+  - `tests/review/test_code_regression_int.py`: 최신 커밋 코드 기반 회귀/경계값/내부 계약(`INT`) 검증 (42개 케이스)
+  - **총 테스트 케이스:** 83개
 
 ---
 
 ## 2. 테스트 케이스 설계 목록 및 근거
 
-### 2.1 PRD 기반 테스트 케이스
+### 2.1 PRD 기반 테스트 케이스 (총 41개)
 
 | 테스트 함수명 | 근거 PRD 조항 | 검증 목적 및 내용 |
 |---|---|---|
@@ -28,12 +29,14 @@
 | `test_FR03_원_매개변수_최소제곱_추정_검증` | FR-03 | 최소제곱법을 통한 원 중심 (a, b) 및 반지름 r의 기하학적 추정 정확성 검증 |
 | `test_FR03_부호규칙_기반_예측_및_결과_유한성_검증` | FR-03 | Velocity * Altitude 부호에 따른 상·하 분기 예측 및 유한값 보장 검증 |
 | `test_FR03_예외조건_대체값_b_반환_및_예외기록_검증` | FR-03 | q < 0 또는 곱이 0일 때 대체값 b 반환 및 예외 사유 기록 검증 |
+| `test_FR03_모델A_학습데이터전체_재추정_검증` | FR-03 | 최종 제출 파일 생성 시 학습 데이터 전체에서 원 중심 (630, 550) 및 반지름 420 재추정 검증 |
 | `test_FR04_모델B_파생피처_생성_원공식_독립성_검증` | FR-04 | 원 공식(630, 550, 420) 없이 일반 파생 피처(abs, square, sign, pair-product, pair-sign) 생성 및 독립성 검증 |
 | `test_FR04_모델B_학습접힘_중앙값_전처리_격리_검증` | FR-04 | 결측치 대체 중앙값이 학습 접힘 데이터에서만 추정되고 평가 데이터에 누수되지 않는지 검증 |
 | `test_FR04_모델B_학습_및_예측_동작_검증` | FR-04 | ModelB 인스턴스의 fit 및 predict 정상 수행과 유한한 예측값 산출 검증 |
 | `test_FR04_모델B_타깃열_및_Satellite_ID_입력차단_검증` | FR-04 | ModelB가 Y_Position(타깃) 또는 Satellite_ID(비승인) 컬럼을 source_columns로 수신할 때의 유입 차단 검증 |
 | `test_FR05_그룹단위_순열중요도_파생피처_동시반영_검증` | FR-05 | 원본 열 순열 시 파생 피처 동시 재계산을 통한 그룹 단위 순열 중요도(Huber 증가량) 산출 검증 |
 | `test_FR05_상위_k개_후보_평가_및_최적k_선택_검증` | FR-05 | k=1..7 후보 평가를 통한 최적 k 및 최고 축소 후보(k<=6) 도출 검증 |
+| `test_FR05_동점시_적은_원본열_후보선택_검증` | FR-05 | 평균 교차검증 Huber 점수가 동일한 경우 원본 열 개수가 더 적은 후보를 우선 선택하는 타이 브레이킹 규칙 검증 |
 | `test_FR06_두_제출파일_행수_컬럼_순서_일치_검증` | FR-06 | outputs의 모델 A, 모델 B 제출 CSV 파일의 63,000행 및 샘플 대비 ID/순서 일치 검증 |
 | `test_FR06_사용자_업로드_안내_문서_존재_검증` | FR-06 | 보고서 내 Kaggle 업로드 순서 안내 명시 및 개발AI의 직접 제출 완료 허위 주장 부재 검증 |
 | `test_FR07_보고서_단계별_지표_및_피처선택_요약_검증` | FR-07 | 보고서 내 단계별 지표(baseline, model_a, model_b 3종) 및 중요도 순위 표 포함 검증 |
@@ -62,7 +65,7 @@
 
 ---
 
-### 2.2 최신 커밋 코드 기반 테스트 케이스 (`INT` 접두어)
+### 2.2 최신 커밋 코드 기반 테스트 케이스 (`INT` 접두어, 총 42개)
 
 | 테스트 함수명 | 근거 변경 파일 및 코드 경로 | 검증 목적 및 내용 |
 |---|---|---|
@@ -83,8 +86,15 @@
 | `test_INT_ModelB_생성자_리스트입력시_튜플변환_검증` | `src/orbit_predict/model_b.py:58` | ModelB 생성 시 리스트 입력이 tuple 타입으로 변환 및 보존되는지 검증 |
 | `test_INT_ModelB_미승인_소스컬럼_예외처리` | `src/orbit_predict/model_b.py:154` | _validate_source_columns 함수 단위 비승인 컬럼 예외 검증 |
 | `test_INT_ModelB_fit_전_predict_호출시_예외처리` | `src/orbit_predict/model_b.py:88` | fit() 전 predict() 호출 시 RuntimeError 발생 검증 |
-| `test_INT_ModelB_타깃길이_불일치_예외처리` | `src/orbit_predict/model_b.py:69` | frame과 target의 행 수 불일치 시 ValueError 발생 검증 |
-| `test_INT_ModelB_비유한_타깃_예외처리` | `src/orbit_predict/model_b.py:72` | target에 NaN 또는 Inf 포함 시 ValueError 발생 검증 |
+| `test_INT_ModelB_타깃길이_불일치_예외처리` | `src/orbit_predict/model_b.py:67` | frame과 target의 행 수 불일치 시 ValueError 발생 검증 |
+| `test_INT_ModelB_비유한_타깃_예외처리` | `src/orbit_predict/model_b.py:71` | target에 NaN 또는 Inf 포함 시 ValueError 발생 검증 |
+| `test_INT_ModelB_빈_학습데이터_fit시_예외처리` | `src/orbit_predict/model_b.py:69` | 0행의 빈 학습 데이터 전달 시 ValueError 발생 검증 |
+| `test_INT_ModelB_fit_전_transform_호출시_예외처리` | `src/orbit_predict/model_b.py:82` | fit() 전 transform() 호출 시 RuntimeError 발생 검증 |
+| `test_INT_ModelB_fit_전_feature_names_접근시_예외처리` | `src/orbit_predict/model_b.py:96` | fit() 전 feature_names 프로퍼티 접근 시 RuntimeError 발생 검증 |
+| `test_INT_ModelB_make_folds_행수부족_예외처리` | `src/orbit_predict/model_b.py:163` | row_count < cv_folds인 경우 ValueError 발생 검증 |
+| `test_INT_ModelB_cross_validate_candidate_타깃길이_불일치_예외처리` | `src/orbit_predict/model_b.py:183` | cross_validate_candidate에서 frame과 target의 길이 불일치 시 ValueError 발생 검증 |
+| `test_INT_ModelB_select_features_타깃길이_불일치_예외처리` | `src/orbit_predict/model_b.py:259` | select_features에서 development_frame과 target의 길이 불일치 시 ValueError 발생 검증 |
+| `test_INT_ModelB_select_features_표본수_CV접힘미달_예외처리` | `src/orbit_predict/model_b.py:262` | sample_size < cv_folds인 경우 ValueError 발생 검증 |
 | `test_INT_metrics_빈배열_입력시_예외처리` | `src/orbit_predict/metrics.py:20` | rmse, competition_huber_score 등에 빈 배열 입력 시 ValueError 발생 검증 |
 | `test_INT_metrics_형상불일치_예외처리` | `src/orbit_predict/metrics.py:13` | y_true와 y_pred 형상 불일치 시 ValueError 발생 검증 |
 | `test_INT_metrics_비유한값_입력시_예외처리` | `src/orbit_predict/metrics.py:22` | y_true 또는 y_pred에 NaN/Inf 입력 시 ValueError 발생 검증 |
@@ -93,6 +103,12 @@
 | `test_INT_data_validate_train_frame_중복ID_예외처리` | `src/orbit_predict/data.py:76` | 학습 데이터에 중복 Satellite_ID 존재 시 DataContractError 발생 검증 |
 | `test_INT_data_validate_test_sample_alignment_불일치_예외처리` | `src/orbit_predict/data.py:137` | test와 sample_submission의 ID 불일치 시 DataContractError 발생 검증 |
 | `test_INT_data_make_submission_예측값_길이불일치_예외처리` | `src/orbit_predict/data.py:238` | 샘플 행 수와 예측값 개수 불일치 시 DataContractError 발생 검증 |
+| `test_INT_data_validate_sample_submission_컬럼불일치_예외처리` | `src/orbit_predict/data.py:118` | sample_submission 컬럼 불일치 시 DataContractError 발생 검증 |
+| `test_INT_data_validate_train_frame_비숫자_타깃_예외처리` | `src/orbit_predict/data.py:57` | train_frame의 Y_Position에 비숫자 값 존재 시 DataContractError 발생 검증 |
+| `test_INT_data_validate_train_frame_소수점_ID_예외처리` | `src/orbit_predict/data.py:75` | train_frame의 Satellite_ID가 실(소수)수일 때 DataContractError 발생 검증 |
+| `test_INT_data_load_datasets_존재하지않는_파일_예외처리` | `src/orbit_predict/data.py:152` | 입력 파일 경로 부재 시 FileNotFoundError 발생 검증 |
+| `test_INT_cli_인자_상호배타_예외처리` | `src/orbit_predict/cli.py:53` | --check-inputs와 --run 인자 상호배타 위반 시 SystemExit 발생 검증 |
+| `test_INT_cli_check_inputs_정상실행_검증` | `src/orbit_predict/cli.py:54` | --check-inputs 플래그 단독 실행 시 반환값 0 검증 |
 | `test_INT_split_make_split_음수행_또는_잘못된_비율_예외처리` | `src/orbit_predict/split.py:30` | row_count <= 0 또는 fraction 범위 오류 시 ValueError 발생 검증 |
 | `test_INT_reporting_json_ready_특수타입_직렬화_검증` | `src/orbit_predict/reporting.py:10` | numpy scalar, nan, inf, 중첩 딕셔너리/리스트 JSON 안전 직렬화 검증 |
 

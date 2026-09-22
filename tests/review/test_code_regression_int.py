@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
 
+from orbit_predict.cli import main
 from orbit_predict.data import (
     DataContractError,
+    DatasetPaths,
+    load_datasets,
     make_submission,
     validate_sample_submission_frame,
     validate_test_frame,
@@ -17,7 +21,14 @@ from orbit_predict.data import (
 from orbit_predict.features import FeatureTransformError, GeneralFeatureBuilder
 from orbit_predict.metrics import competition_huber_score, metric_dict, rmse
 from orbit_predict.model_a import CircleParameters, ModelAError, fit_circle, predict_circle
-from orbit_predict.model_b import ModelB, ModelBConfig, _validate_source_columns
+from orbit_predict.model_b import (
+    ModelB,
+    ModelBConfig,
+    _make_folds,
+    _validate_source_columns,
+    cross_validate_candidate,
+    select_features,
+)
 from orbit_predict.reporting import json_ready
 from orbit_predict.split import make_split
 
@@ -184,6 +195,59 @@ def test_INT_ModelB_비유한_타깃_예외처리() -> None:
         model.fit(df, [10.0, np.nan])
 
 
+def test_INT_ModelB_빈_학습데이터_fit시_예외처리() -> None:
+    """ModelB: 빈 데이터(0행) 전달 시 ValueError 발생."""
+    model = ModelB(("X_Position",), ModelBConfig())
+    df = pd.DataFrame({"X_Position": []})
+    with pytest.raises(ValueError, match="requires at least one training row"):
+        model.fit(df, [])
+
+
+def test_INT_ModelB_fit_전_transform_호출시_예외처리() -> None:
+    """ModelB: fit() 호출 전 transform() 호출 시 RuntimeError 발생."""
+    model = ModelB(("X_Position",), ModelBConfig())
+    df = pd.DataFrame({"X_Position": [1.0, 2.0]})
+    with pytest.raises(RuntimeError, match="model B is not fitted"):
+        model.transform(df)
+
+
+def test_INT_ModelB_fit_전_feature_names_접근시_예외처리() -> None:
+    """ModelB: fit() 호출 전 feature_names 접근 시 RuntimeError 발생."""
+    model = ModelB(("X_Position",), ModelBConfig())
+    with pytest.raises(RuntimeError, match="model B is not fitted"):
+        _ = model.feature_names
+
+
+def test_INT_ModelB_make_folds_행수부족_예외처리() -> None:
+    """_make_folds: row_count < cv_folds인 경우 ValueError 발생."""
+    config = ModelBConfig(cv_folds=5)
+    with pytest.raises(ValueError, match="at least 5 rows are required"):
+        _make_folds(3, config)
+
+
+def test_INT_ModelB_cross_validate_candidate_타깃길이_불일치_예외처리() -> None:
+    """cross_validate_candidate: frame과 target의 행 수 불일치 시 ValueError 발생."""
+    config = ModelBConfig(cv_folds=2)
+    df = pd.DataFrame({"X_Position": [1.0, 2.0, 3.0]})
+    with pytest.raises(ValueError, match="frame and target lengths must match"):
+        cross_validate_candidate(df, [10.0, 20.0], ("X_Position",), config=config)
+
+
+def test_INT_ModelB_select_features_타깃길이_불일치_예외처리() -> None:
+    """select_features: development_frame과 target의 길이 불일치 시 ValueError 발생."""
+    df = pd.DataFrame({"X_Position": [1.0, 2.0, 3.0]})
+    with pytest.raises(ValueError, match="development frame and target lengths must match"):
+        select_features(df, [10.0, 20.0])
+
+
+def test_INT_ModelB_select_features_표본수_CV접힘미달_예외처리() -> None:
+    """select_features: sample_size < cv_folds인 경우 ValueError 발생."""
+    config = ModelBConfig(cv_folds=5, selection_sample_size=3)
+    df = pd.DataFrame({"X_Position": [1.0, 2.0, 3.0]})
+    with pytest.raises(ValueError, match="selection sample is too small"):
+        select_features(df, [10.0, 20.0, 30.0], config=config)
+
+
 # --- metrics.py INT tests ---
 
 def test_INT_metrics_빈배열_입력시_예외처리() -> None:
@@ -249,6 +313,62 @@ def test_INT_data_make_submission_예측값_길이불일치_예외처리() -> No
     sample_df = pd.DataFrame({"Satellite_ID": [1, 2], "Y_Position": [63.0, 63.0]})
     with pytest.raises(DataContractError, match="does not match sample rows"):
         make_submission(sample_df, [10.0])
+
+
+def test_INT_data_validate_sample_submission_컬럼불일치_예외처리() -> None:
+    """validate_sample_submission_frame: 컬럼 불일치 시 DataContractError 발생."""
+    df = pd.DataFrame({"Wrong_ID": [1], "Y_Position": [63.0]})
+    with pytest.raises(DataContractError, match="sample_submission columns must be"):
+        validate_sample_submission_frame(df, expected_rows=None)
+
+
+def test_INT_data_validate_train_frame_비숫자_타깃_예외처리() -> None:
+    """validate_train_frame: 타깃 Y_Position에 비숫자 문자열 포함 시 DataContractError 발생."""
+    from orbit_predict.constants import ID_COLUMN, INPUT_COLUMNS, TARGET_COLUMN
+    data = {ID_COLUMN: [100]}
+    data.update({col: [1.0] for col in INPUT_COLUMNS})
+    data[TARGET_COLUMN] = ["not_a_number"]
+    df = pd.DataFrame(data)
+    with pytest.raises(DataContractError, match="contains a non-numeric value"):
+        validate_train_frame(df, expected_rows=None)
+
+
+def test_INT_data_validate_train_frame_소수점_ID_예외처리() -> None:
+    """validate_train_frame: Satellite_ID에 소수점(실수) 포함 시 DataContractError 발생."""
+    from orbit_predict.constants import ID_COLUMN, INPUT_COLUMNS, TARGET_COLUMN
+    data = {ID_COLUMN: [1.5]}
+    data.update({col: [1.0] for col in INPUT_COLUMNS})
+    data[TARGET_COLUMN] = [10.0]
+    df = pd.DataFrame(data)
+    with pytest.raises(DataContractError, match="must contain integer IDs"):
+        validate_train_frame(df, expected_rows=None)
+
+
+def test_INT_data_load_datasets_존재하지않는_파일_예외처리() -> None:
+    """load_datasets: 존재하지 않는 파일 경로 전달 시 FileNotFoundError 발생."""
+    paths = DatasetPaths(
+        train=Path("non_existent_train.csv"),
+        test=Path("non_existent_test.csv"),
+        sample_submission=Path("non_existent_sample.csv"),
+    )
+    with pytest.raises(FileNotFoundError, match="input CSV does not exist"):
+        load_datasets(paths)
+
+
+# --- cli.py INT tests ---
+
+def test_INT_cli_인자_상호배타_예외처리() -> None:
+    """cli: --check-inputs와 --run은 상호 배타적이며 둘 다 지정하거나 둘 다 누락 시 SystemExit 발생."""
+    with pytest.raises(SystemExit, match="choose exactly one of --check-inputs or --run"):
+        main([])
+    with pytest.raises(SystemExit, match="choose exactly one of --check-inputs or --run"):
+        main(["--check-inputs", "--run"])
+
+
+def test_INT_cli_check_inputs_정상실행_검증() -> None:
+    """cli: --check-inputs 플래그로 정상 실행 시 종료 코드 0 반환."""
+    rc = main(["--check-inputs"])
+    assert rc == 0
 
 
 # --- split.py INT tests ---
