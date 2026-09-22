@@ -78,7 +78,7 @@ RMSE와 Huber 점수는 서로 다른 목적의 지표이며, 대회 선택 기�
 - `data_distribution`: `artifacts\data_distribution.json`
 - `error_segments`: `artifacts\error_segments.json`
 
-두 CSV는 `Satellite_ID,Y_Position` 순서이며 샘플 제출물의 ID·행 순서를 검증했다. 사용자는 다음 순서로 Kaggle에서 직접 제출한다.
+두 CSV는 `Satellite_ID,Y_Position` 순서이며 샘플 제출물의 ID·행 순서를 검증했다. 사용자가 Kaggle에서 직접 제출하며, 다음 순서로 진행한다.
 
 1. Kaggle 대회의 Submit Predictions 화면을 연다.
 2. `submission_model_a.csv`를 업로드하고 제출 이름에 Model A를 표시한다.
