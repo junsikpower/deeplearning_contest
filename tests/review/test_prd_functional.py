@@ -172,6 +172,15 @@ def test_FR03_예외조건_대체값_b_반환_및_예외기록_검증() -> None:
     assert "velocity_altitude_product_zero" in str(res.exceptions[1]["reason"])
 
 
+def test_FR03_모델A_학습데이터전체_재추정_검증() -> None:
+    """PRD FR-03: 최종 제출 파일 생성 시에는 학습 데이터 전체에서 중심·반지름을 다시 추정한다."""
+    train_sample = pd.read_csv(TRAIN_PATH, nrows=5000)
+    params = fit_circle(train_sample)
+    assert params.center_x == pytest.approx(630.0, abs=1.0)
+    assert params.center_y == pytest.approx(550.0, abs=1.0)
+    assert params.radius == pytest.approx(420.0, abs=1.0)
+
+
 def test_FR04_모델B_파생피처_생성_원공식_독립성_검증() -> None:
     """PRD FR-04: 원 공식(중심 630, 550, 반지름 420 등) 없이 일반 파생 피처(abs, sq, sign, pair product 등)를 생성."""
     builder = GeneralFeatureBuilder(("X_Position", "Velocity"))
