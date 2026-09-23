@@ -3,6 +3,14 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
-reports/*.xml
+reports/
 .pipeline/
+.github/
+docs/
+prompts/
+tests/
+workflows/
+Makefile
+pipeline.sh
+
 
